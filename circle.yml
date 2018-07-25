@@ -20,7 +20,7 @@ jobs:
           command: npm install
       - run:
           name: Execute API tests
-          command: npm run test:ci
+          command: npm run test
       - run:
           name: Notify build completed
           command: |

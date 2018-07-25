@@ -1,0 +1,42 @@
+{
+    "name": "serverless-typescript-quickstart",
+    "version": "1.0.0",
+    "author": "SYSEN LIMITED",
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "start": "serverless offline start --stage dev",
+        "test": "tsc && nyc cucumber-js --require ./test ./test/features --exit",
+        "deploy:prod": "serverless create_domain --stage production && serverless deploy -v --stage production",
+        "deploy:test": "serverless create_domain --stage test && serverless deploy -v --stage test"
+    },
+    "dependencies": {
+        "aws-serverless-express": "3.2.0",
+        "body-parser": "1.18.3",
+        "cors": "2.8.4",
+        "ejs": "2.6.1",
+        "express": "4.16.3",
+        "helmet": "3.13.0",
+        "winston": "3.0.0"
+    },
+    "devDependencies": {
+        "@types/aws-serverless-express": "3.0.1",
+        "@types/cors": "2.8.4",
+        "@types/ejs": "2.6.0",
+        "@types/express": "4.16.0",
+        "@types/helmet": "0.0.38",
+        "@types/node": "10.5.3",
+        "@types/winston": "2.3.9",
+        "aws-sdk": "2.281.1",
+        "chai": "4.1.2",
+        "cucumber": "4.2.1",
+        "nock": "9.4.3",
+        "nyc": "12.0.2",
+        "serverless": "1.29.0",
+        "serverless-domain-manager": "2.6.0",
+        "serverless-offline": "3.25.6",
+        "serverless-plugin-typescript": "1.1.5",
+        "supertest": "3.1.0",
+        "typescript": "2.9.2"
+    }
+}

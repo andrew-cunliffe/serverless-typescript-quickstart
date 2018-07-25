@@ -1,0 +1,95 @@
+version: 2
+
+jobs:
+  test:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run:
+          name: Notify build started
+          command: |
+            BUILD=$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+            curl -H "Content-Type: application/json" \
+            -d '{ "release": "'$BUILD'" }' \
+            -X POST https://api-pipeline.dashboardhub.io/environments/$DH_ENV/deployed/$DH_TOKEN/startBuild
+      - run:
+          name: Install dependencies
+          command: npm install
+      - run:
+          name: Execute API tests
+          command: npm run test:ci
+      - run:
+          name: Notify build completed
+          command: |
+            BUILD=$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+            curl -H "Content-Type: application/json" \
+            -d '{ "release": "'$BUILD'" }' \
+            -X POST https://api-pipeline.dashboardhub.io/environments/$DH_ENV/deployed/$DH_TOKEN/finishBuild
+      - run:
+          name: Notify build failed
+          when: on_fail
+          command: |
+            BUILD=$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+            curl -H "Content-Type: application/json" \
+            -d '{ "release": "'$BUILD'" }' \
+            -X POST https://api-pipeline.dashboardhub.io/environments/$DH_ENV/deployed/$DH_TOKEN/failBuild
+      - save_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+      - store_artifacts:
+          path: coverage
+
+  deploy:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package.json" }}
+      - run: sudo apt-get update
+      - run: sudo apt-get install python3 python3-pip
+      - run: sudo pip3 install awscli --upgrade
+      - run:
+          name: Notify deploy start
+          command: |
+            BUILD=$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+            curl -H "Content-Type: application/json" \
+            -d '{ "release": "'$BUILD'" }' \
+            -X POST https://api-pipeline.dashboardhub.io/environments/$DH_ENV/deployed/$DH_TOKEN/startDeploy
+      - run:
+          name: Create deployment
+          command: AWS_ACCESS_KEY_ID=$AWS_DEPLOY_KEY AWS_SECRET_ACCESS_KEY=$AWS_DEPLOY_SECRET_KEY npm run deploy:prod
+      - run:
+          name: Notify deploy completed
+          command: |
+            BUILD=$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+            curl -H "Content-Type: application/json" \
+            -d '{ "release": "'$BUILD'" }' \
+            -X POST https://api-pipeline.dashboardhub.io/environments/$DH_ENV/deployed/$DH_TOKEN/finishDeploy
+      - run:
+          name: Notify deploy failed
+          when: on_fail
+          command: |
+            BUILD=$CIRCLE_BRANCH-${CIRCLE_SHA1:0:7}
+            curl -H "Content-Type: application/json" \
+            -d '{ "release": "'$BUILD'" }' \
+            -X POST https://api-pipeline.dashboardhub.io/environments/$DH_ENV/deployed/$DH_TOKEN/failDeploy
+
+workflows:
+  version: 2
+
+  test-deploy:
+    jobs:
+      - test
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/

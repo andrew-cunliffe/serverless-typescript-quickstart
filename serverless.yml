@@ -1,0 +1,45 @@
+service: example-api
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: eu-west-1
+  memorySize: 128
+  timeout: 5
+  environment:
+    CONTACT_EMAIL: ${file(./config.json):${opt:stage}.CONTACT_EMAIL}
+    REPLY_TO: ${file(./config.json):${opt:stage}.REPLY_TO}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "ses:SendEmail"
+      Resource: '*'
+
+package:
+  exclude:
+    - "**/*.ts"
+    - "*"
+  include:
+    - "src/**/*.js"
+    - "src/**/*.md"
+    - "src/**/*.ejs"
+
+plugins:
+  - serverless-domain-manager
+  - serverless-plugin-typescript
+  - serverless-offline
+
+functions:
+  example:
+    description: 'Example API'
+    handler: src/lambda-example.api
+    events:
+      - http: ANY /example
+      - http: ANY /example/{proxy+}
+
+custom:
+  customDomain:
+    domainName: ${file(./config.json):${opt:stage}.API_DOMAIN}
+    basePath: ''
+    stage: ${opt:stage}
+    createRoute53Record: true

@@ -1,0 +1,10 @@
+<%- include('common/header.ejs', { subject }) %>
+<tr>
+    <td>
+        <p>Message from <strong>${contact.fullName}</strong>.</p>
+    </td>
+</tr>
+<tr>
+    <td>${contact.message}</td>
+</tr>
+<%- include('common/footer.ejs', { sender }) %>

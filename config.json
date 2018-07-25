@@ -1,0 +1,17 @@
+{
+    "dev": {
+        "API_DOMAIN": "api.example.com",
+        "CONTACT_EMAIL": "contact@example.com",
+        "REPLY_TO": "support@example.com"
+    },
+    "test": {
+        "API_DOMAIN": "api.example.com",
+        "CONTACT_EMAIL": "contact@example.com",
+        "REPLY_TO": "support@example.com"
+    },
+    "production": {
+        "API_DOMAIN": "api.example.com",
+        "CONTACT_EMAIL": "contact@example.com",
+        "REPLY_TO": "support@example.com"
+    }
+}

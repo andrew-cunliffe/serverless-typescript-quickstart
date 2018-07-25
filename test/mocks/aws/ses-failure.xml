@@ -1,0 +1,8 @@
+<ErrorResponse xmlns="http://ses.amazonaws.com/doc/2010-12-01/">
+    <Error>
+        <Type>Sender</Type>
+        <Code>MessageRejected</Code>
+        <Message>Email address is not verified. The following identities failed the check in region EU-WEST-1: unverified@example.com</Message>
+    </Error>
+    <RequestId>00000000-0000-0000-0000-000000000000</RequestId>
+</ErrorResponse>
